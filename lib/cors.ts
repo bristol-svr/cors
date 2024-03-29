@@ -1,7 +1,21 @@
-import { Context, Middleware, Next } from '@colstonjs/core';
+import { ErrorLike } from 'bun';
 import vary from 'vary';
 
+// import { Context } from '@colstonjs/core';
+
+type Context = {
+  req: CorsRequest;
+  setHeader(key: string, value: string): Context;
+  option(option?: ResponseInit): Context;
+  head(option?: ResponseInit): Response
+}
+type Next = <T = ErrorLike>(error?: T) => Promise<void> | void
 type TOriginFn = (origin: string, callback: (err: Error | null, allow?: boolean | undefined) => void) => void;
+
+type CorsRequest = {
+  method?: string | undefined;
+  headers: Headers & { [key: string]: any }
+}
 interface CorsOptions {
   headers?: string | string[] | undefined;
   origin?: string | string[] | RegExp | TOriginFn;
@@ -146,7 +160,7 @@ function configureMaxAge(options: CorsOptions): Header | null {
 }
 
 function applyHeaders(headers: Header[], ctx: Context): void {
-  ctx.getHeader = ctx.header.get;
+  // ctx.setHeader = ctx.header.get;
   for (const header of headers) {
     if (header) {
       if (header.key === 'Vary' && header.value) {
@@ -187,8 +201,8 @@ function cors(options: CorsOptions, context: Context, next: Next): void {
   }
 }
 
-function middlewareWrapper(options: CorsOptions = defaults): Middleware {
-  return function corsMiddleware(context: Context, next: Next) {
+function middlewareWrapper<T extends Context>(options: CorsOptions = defaults): (context: T, next: Next) => void | Response | Promise<void | Response> {
+  return function corsMiddleware(context: T, next: Next) {
     const corsOptions = Object.assign<CorsOptions, CorsOptions>(defaults, options);
     let originCallback: ((origin: string, callback: (err: Error | null, origin: string | boolean | undefined) => void) => void) | null = null;
 
