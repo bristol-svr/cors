@@ -7,7 +7,8 @@ type Context = {
   req: CorsRequest;
   setHeader(key: string, value: string): Context;
   option(option?: ResponseInit): Context;
-  head(option?: ResponseInit): Response
+  head(option?: ResponseInit): Response;
+  [key: string]: any;
 }
 type Next = <T = ErrorLike>(error?: T) => Promise<void> | void
 type TOriginFn = (origin: string, callback: (err: Error | null, allow?: boolean | undefined) => void) => void;
@@ -160,7 +161,7 @@ function configureMaxAge(options: CorsOptions): Header | null {
 }
 
 function applyHeaders(headers: Header[], ctx: Context): void {
-  // ctx.setHeader = ctx.header.get;
+  ctx.getHeader = ctx.header.get;
   for (const header of headers) {
     if (header) {
       if (header.key === 'Vary' && header.value) {
@@ -210,7 +211,7 @@ function middlewareWrapper<T extends Context>(options: CorsOptions = defaults): 
       originCallback = corsOptions.origin;
     } else if (corsOptions.origin) {
       originCallback = function (origin, cb) {
-        cb(null, corsOptions.origin as string);
+        cb(null, origin || corsOptions.origin as string);
       };
     }
 

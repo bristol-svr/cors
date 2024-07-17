@@ -1,6 +1,6 @@
 {
   "name": "@colstonjs/cors",
-  "version": "1.0.0-rc.1",
+  "version": "1.0.0-rc.2",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -21,15 +21,13 @@
     "dist",
     "package.json",
     "README.md",
-    "tsconfig.json",
     "LICENSE"
   ],
   "peerDependencies": {
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "vary": "^1.1.2",
-    "@colstonjs/core": "latest"
+    "vary": "^1.1.2"
   },
   "scripts": {
     "build": "bun build.ts"
